@@ -44,7 +44,7 @@ class Cartcontrol extends Component{
                 count: prevState.count + 1
             }))
         }
-        typeof this.props.add === 'function' && this.props.add(this.ball,this.props.food.name,this.props.food.price);
+        typeof this.props.add === 'function' && this.props.add(this.props.food.name,this.props.food.price);
     }
 
     decreaseCart = (ev) => {
@@ -57,10 +57,6 @@ class Cartcontrol extends Component{
         typeof this.props.decrease === 'function' && this.props.decrease(this.props.food.name);
     }
 
-    getBall = (ball) => {
-        this.ball = ball;
-    }
-
     render(){
         return (
             <div className="cartcontrol">
@@ -68,7 +64,7 @@ class Cartcontrol extends Component{
                     <span className="inner icon-remove_circle_outline"></span>
                 </div>
                 <div className={`cart-count${this.state.count>0?'':' hide'}`}>{this.state.count}</div>
-                <div className="cart-add icon-add_circle" ref={this.getBall} onClick={(ev)=>{this.addCart(ev)}}></div>
+                <div className="cart-add icon-add_circle" onClick={(ev)=>{this.addCart(ev)}}></div>
             </div>
         )
     }

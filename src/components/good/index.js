@@ -13,7 +13,6 @@ class Good extends Component{
             scrollY: 0,
             seller: '',
             selectFoods: [],
-            dropTarget: '',
             selectedFood: {}
         }
         this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
@@ -101,8 +100,7 @@ class Good extends Component{
         this.foodScroll.scrollToElement(el, 300);
     }
 
-    addFood = (ball, name, price) => {
-        // this._drop(ball);
+    addFood = (name, price) => {
         let sf = this.state.selectFoods;
         let flag = true;
         if(sf.length){
@@ -138,12 +136,6 @@ class Good extends Component{
             selectFoods: sf
         },()=>{
             this.forceUpdate();
-        })
-    }
-
-    _drop = (target) => {
-        this.setState({
-            dropTarget: target
         })
     }
 
@@ -250,7 +242,6 @@ class Good extends Component{
                 </div>
                 <Shopcart 
                     ref={this.getShopcart}
-                    dropTarget={this.state.dropTarget}
                     deliveryPrice={this.state.seller.deliveryPrice}
                     minPrice={this.state.seller.minPrice}
                     selectFoods={this.state.selectFoods}

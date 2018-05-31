@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './shopcart.styl';
 
 import Cartcontrol from '../cartcontrol/cartcontrol';
+import { CSSTransitionGroup } from 'react-transition-group';
 
 class Shopcart extends Component{
     constructor(props){
@@ -11,31 +12,9 @@ class Shopcart extends Component{
             totalPrice: 0,
             listShow: false
         }
-        this.balls = [
-            {
-              show: false
-            },
-            {
-              show: false
-            },
-            {
-              show: false
-            },
-            {
-              show: false
-            },
-            {
-              show: false
-            }
-        ];
-        this.dropBalls = [];
     }
 
     componentWillReceiveProps () {
-        // console.log(this.props.dropTarget);
-        // if(this.props.dropTarget!==''){
-        //     this.drop(this.props.dropTarget);
-        // }
         this.calculateTotal();
     }
 
@@ -70,18 +49,6 @@ class Shopcart extends Component{
         })
     }
 
-    drop = (el) => {
-        for (let i = 0; i < this.balls.length; i++) {
-            let ball = this.balls[i];
-            if (!ball.show) {
-                ball.show = true;
-                ball.el = el;
-                this.dropBalls.push(ball);
-                return;
-            }
-        }
-    }
-
     pay = (ev) => {
         ev.stopPropagation();
         if(this.state.totalPrice < this.props.minPrice){
@@ -112,8 +79,8 @@ class Shopcart extends Component{
         })
     }
 
-    addFood = (ball, name, price) => {
-        typeof this.props.addFood === 'function' && this.props.addFood(ball, name, price);
+    addFood = (name, price) => {
+        typeof this.props.addFood === 'function' && this.props.addFood(name, price);
     }
 
     decrease = (name) => {
@@ -121,8 +88,6 @@ class Shopcart extends Component{
     }
 
     render(){
-        //console.log(this.balls)
-
         return (
             <div>
                 <div className="shopcart">
@@ -141,19 +106,7 @@ class Shopcart extends Component{
                             <div className={`pay${(this.state.totalPrice>=this.props.minPrice)?' enough':' not-enough'}`}>{this.state.payDesc}</div>
                         </div>
                     </div>
-                    <div className="ball-container">
-                        {
-                            this.balls.map((ball, index)=>{
-                                return(
-                                    <div key={index}>
-                                        <div className={`ball${ball.show?' show':''}`}>
-                                            <div className="inner inner-hook"></div>
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
+                    
                     <div className={`shopcart-list${this.state.listShow?' show':' hide'}`}>
                         <div className="list-header">
                             <h1 className="title">购物车</h1>

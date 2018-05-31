@@ -4,6 +4,7 @@ import BScroll from 'better-scroll';
 import Cartcontrol from '../cartcontrol/cartcontrol';
 import Split from '../split/split';
 import RatingSelect from '../ratingselect/index';
+import { CSSTransitionGroup } from 'react-transition-group';
 
 class Food extends Component {
     constructor(props) {
@@ -124,46 +125,51 @@ class Food extends Component {
         }
 
         return (
-            <div className={`food${this.showFlag?' show':' hide'}`} ref={this.getFood}>
-                <div className="food-content">
-                    <div className="image-header">
-                        <img src={food.image} alt=""/>
-                        <div className="back" onClick={this.hide}>
-                            <i className="icon-arrow_lift"></i>
+            <CSSTransitionGroup
+                transitionName="move"
+                transitionEnterTimeout={300}
+                transitionLeaveTimeout={300}>
+                <div className={`food${this.showFlag?' show':' hide'}`} ref={this.getFood}>
+                    <div className="food-content">
+                        <div className="image-header">
+                            <img src={food.image} alt=""/>
+                            <div className="back" onClick={this.hide}>
+                                <i className="icon-arrow_lift"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div className="content">
-                        <div className="title">{food.name}</div>
-                        <div className="detail">
-                            <span className="sell-count">月售{food.sellCount}份</span>
-                            <span className="rating">好评率{food.rating}%</span>
+                        <div className="content">
+                            <div className="title">{food.name}</div>
+                            <div className="detail">
+                                <span className="sell-count">月售{food.sellCount}份</span>
+                                <span className="rating">好评率{food.rating}%</span>
+                            </div>
+                            <div className="price">
+                                <span className="now">￥{food.price}</span><span className={`old${food.oldPrice?' show':''}`}>￥{food.oldPrice}</span>
+                            </div>
+                            <div className="cartcontrol-wrapper">
+                                <Cartcontrol
+                                    food={this.props.food}
+                                    selectFoods={this.props.selectFoods}
+                                    add={this.add} 
+                                    decrease={this.decrease}
+                                ></Cartcontrol>
+                            </div>
+                            <div className={`buy${(!this.count || this.count===0)?' show':''}`} onClick={this.addFirst}>加入购物车</div> 
                         </div>
-                        <div className="price">
-                            <span className="now">￥{food.price}</span><span className={`old${food.oldPrice?' show':''}`}>￥{food.oldPrice}</span>
-                        </div>
-                        <div className="cartcontrol-wrapper">
-                            <Cartcontrol
-                                food={this.props.food}
-                                selectFoods={this.props.selectFoods}
-                                add={this.add} 
-                                decrease={this.decrease}
-                            ></Cartcontrol>
-                        </div>
-                        <div className={`buy${(!this.count || this.count===0)?' show':''}`} onClick={this.addFirst}>加入购物车</div> 
-                    </div>
-                    <Split className={`${food.info?'':'hide'}`}></Split>
-                    <div className="rating">
-                        <h1 className="title">商品评价</h1>
-                        {ratingselect}
-                        <div className="rating-wrapper">
-                            <ul className={`${(food.ratings&&food.ratings.length)?'':'hide'}`}>
-                                {ratings}
-                            </ul>
-                            <div className={`no-rating${(!food.ratings || !food.ratings.length)?' show':''}`}>暂无评价</div>
+                        <Split className={`${food.info?'':'hide'}`}></Split>
+                        <div className="rating">
+                            <h1 className="title">商品评价</h1>
+                            {ratingselect}
+                            <div className="rating-wrapper">
+                                <ul className={`${(food.ratings&&food.ratings.length)?'':'hide'}`}>
+                                    {ratings}
+                                </ul>
+                                <div className={`no-rating${(!food.ratings || !food.ratings.length)?' show':''}`}>暂无评价</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </CSSTransitionGroup>
         );
     }
 }
