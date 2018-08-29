@@ -55,6 +55,10 @@ class Good extends Component{
     }
 
     componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch({
+            type: 'resetRatings'
+        })
         if(this.menuWrapper && !this.state.canScroll){
             this.initScroll();
             this.calculateHeight();

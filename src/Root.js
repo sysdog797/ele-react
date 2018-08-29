@@ -78,6 +78,11 @@ function myReducer(
             return Object.assign({}, state, {
                 onlyContent: action.onlyContent
             })
+        case 'resetRatings':
+            return Object.assign({}, state, {
+                onlyContent: false,
+                selectType: 2
+            })
         default:
             return state;
     }
