@@ -7,32 +7,55 @@ import Star from '../star/index';
 import Split from '../split/split';
 import RatingSelect from '../ratingselect/index';
 
+import { connect } from 'react-redux';
+
+function mapStateToProps(state){
+    const { datas, onlyContent, selectType } = state;
+    return { datas, onlyContent, selectType }
+}
+
 class Ratings extends Component{
     constructor(){
         super();
         this.state = {
-            ratings: '',
-            seller: '',
-            selectType: 2,
+            //ratings: '',
+            //seller: '',
+            //selectType: 2,
             needShow: true,
-            onlyContent: true
+            //onlyContent: true,
+            initScroll: false
         }
     }
 
     componentDidMount(){
-        fetch('data.json').then(rs => {
-            rs.json().then(datas => {
-                this.setState({
-                    ratings: datas.ratings,
-                    seller: datas.seller
-                },this.registerMethod);
+        // fetch('data.json').then(rs => {
+        //     rs.json().then(datas => {
+        //         this.setState({
+        //             ratings: datas.ratings,
+        //             seller: datas.seller
+        //         },this.registerMethod);
+        //     })
+        // })
+        if(this.ratings && !this.state.initScroll){
+            this.initScroll();
+            this.setState({
+                initScroll: true
             })
-        })
+        }
     }
 
-    registerMethod = () => {
-        this.initScroll();
+    componentDidUpdate(){
+        if(this.ratings && !this.state.initScroll){
+            this.initScroll();
+            this.setState({
+                initScroll: true
+            })
+        }
     }
+
+    // registerMethod = () => {
+    //     this.initScroll();
+    // }
 
     initScroll = () => {
         this.ratingScroll = new BScroll(this.ratings,{
@@ -44,35 +67,39 @@ class Ratings extends Component{
         this.ratings = ratings;
     }
 
-    selectRating = (type) => {
-        this.setState({
-            selectType: type
-        })
-        this.ratingScroll.refresh();
-    }
+    // selectRating = (type) => {
+    //     this.setState({
+    //         selectType: type
+    //     })
+    //     this.ratingScroll.refresh();
+    // }
 
     needShow = (type, text) => {
-        if (this.state.onlyContent && !text) {
+        if (this.props.onlyContent && !text) {
             return '';
         }
-        if (this.state.selectType === 2) {
+        if (this.props.selectType === 2) {
             return ' show';
         } else {
-            return (type === this.state.selectType)?' show':'';
+            return (type === this.props.selectType)?' show':'';
         }
     }
 
-    toggleContent = () => {
-        this.setState((prevState)=>({
-            onlyContent: !prevState.onlyContent
-        }))
-    }
+    // toggleContent = () => {
+    //     this.setState((prevState)=>({
+    //         onlyContent: !prevState.onlyContent
+    //     }))
+    // }
 
     render(){
-        let ratings = this.state.ratings;
-        let seller = this.state.seller;
+        //let ratings = this.state.ratings;
+        //let seller = this.state.seller;
 
-        if(ratings === ''){
+        let { datas } = this.props;
+        let ratings = datas.ratings;
+        let seller = datas.seller;
+
+        if(!datas){
             return ''
         }
 
@@ -104,11 +131,12 @@ class Ratings extends Component{
                     </div>
                     <Split></Split>
                     <RatingSelect 
-                        select={this.selectRating} 
-                        ratings={ratings} 
-                        selectType={this.state.selectType} 
-                        toggle={this.toggleContent}
-                        onlyContent={this.state.onlyContent}>
+                        //select={this.selectRating} 
+                        //ratings={ratings} 
+                        //selectType={this.state.selectType} 
+                        //toggle={this.toggleContent}
+                        //onlyContent={this.state.onlyContent}
+                    >
                     </RatingSelect>
                     <div className="rating-wrapper">
                         <ul>
@@ -127,7 +155,7 @@ class Ratings extends Component{
                                                 </div>
                                                 <p className="text">{rating.text}</p>
                                                 <div className="recommend">
-                                                    <span className="icon-thumb_up"></span>
+                                                    <span className={`${(rating.rateType===0)?'icon-thumb_up':''}${(rating.rateType===1)?'icon-thumb_down':''}`}></span>
                                                     {rating.recommend.map((item, index)=>{
                                                         return(
                                                             <span className="item" key={index}>{item}</span>
@@ -148,4 +176,4 @@ class Ratings extends Component{
     }  
 }
 
-export default Ratings;
+export default connect(mapStateToProps)(Ratings);
