@@ -2,18 +2,12 @@ import React, { Component } from 'react';
 import './index.styl';
 
 import { connect } from 'react-redux';
-
-function mapStateToProps(state){
-    const { datas, selectType, onlyContent, selectedFood } = state;
-    return { datas, selectType, onlyContent, selectedFood }
-}
+import { bindActionCreators } from 'redux';
+import * as goodActions from '../../store/good/actions';
 
 class RatingSelect extends Component{
     constructor(props){
         super(props);
-        this.state = {
-            onlyContent: false
-        }
         this.desc = {
             all: '全部',
             positive: '满意',
@@ -24,54 +18,18 @@ class RatingSelect extends Component{
         this.negative = 1;
     }
 
-    // componentDidMount () {
-    //     this.getPositives();
-    //     this.getNegatives();
-    // }
-
-    // getPositives = () => {
-    //     let count = this.props.datas.ratings.filter((rating)=>{
-    //         return rating.rateType === this.positive;
-    //     })
-    //     this.setState({
-    //         positive: count
-    //     })
-    // }
-    
-    // getNegatives = () => {
-    //     let count = this.props.datas.ratings.filter((rating)=>{
-    //         return rating.rateType === this.negative;
-    //     })
-    //     this.setState({
-    //         negative: count
-    //     })
-    // }
-
     select = (type, ev) => {
         // if (!ev._constructed) {
         //     return;
         // }
-        //typeof this.props.select === 'function' && this.props.select(type);
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'selectRating',
-            selectType: type
-        })
+        this.props.actions.selectRating(type);
     }
 
     toggleContent = (ev) => {
         // if (!ev._constructed) {
         //     return;
         // }
-        //typeof this.props.toggle === 'function' && this.props.toggle();
-        // this.setState({
-        //     onlyContent: !this.state.onlyContent
-        // })
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'toggleContent',
-            onlyContent: !this.props.onlyContent
-        })
+        this.props.actions.toggleContent(this.props.onlyContent);
     }
 
     render(){
@@ -108,4 +66,20 @@ class RatingSelect extends Component{
     }
 }
 
-export default connect(mapStateToProps)(RatingSelect);
+function mapStateToProps(state) {
+    return {
+        datas: state.good.datas,
+        selectType: state.good.selectType,
+        onlyContent: state.good.onlyContent,
+        selectedFood: state.good.selectedFood
+    }
+}
+
+function mapDispatchToProps(dispatch, ownProps) {
+    return {
+        ...ownProps,
+        actions: bindActionCreators({...goodActions}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RatingSelect);

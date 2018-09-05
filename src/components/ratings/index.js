@@ -9,33 +9,16 @@ import RatingSelect from '../ratingselect/index';
 
 import { connect } from 'react-redux';
 
-function mapStateToProps(state){
-    const { datas, onlyContent, selectType } = state;
-    return { datas, onlyContent, selectType }
-}
-
 class Ratings extends Component{
     constructor(){
         super();
         this.state = {
-            //ratings: '',
-            //seller: '',
-            //selectType: 2,
             needShow: true,
-            //onlyContent: true,
             initScroll: false
         }
     }
 
     componentDidMount(){
-        // fetch('data.json').then(rs => {
-        //     rs.json().then(datas => {
-        //         this.setState({
-        //             ratings: datas.ratings,
-        //             seller: datas.seller
-        //         },this.registerMethod);
-        //     })
-        // })
         if(this.ratings && !this.state.initScroll){
             this.initScroll();
             this.setState({
@@ -53,10 +36,6 @@ class Ratings extends Component{
         }
     }
 
-    // registerMethod = () => {
-    //     this.initScroll();
-    // }
-
     initScroll = () => {
         this.ratingScroll = new BScroll(this.ratings,{
             click: true
@@ -67,13 +46,6 @@ class Ratings extends Component{
         this.ratings = ratings;
     }
 
-    // selectRating = (type) => {
-    //     this.setState({
-    //         selectType: type
-    //     })
-    //     this.ratingScroll.refresh();
-    // }
-
     needShow = (type, text) => {
         if (this.props.onlyContent && !text) {
             return '';
@@ -81,20 +53,11 @@ class Ratings extends Component{
         if (this.props.selectType === 2) {
             return ' show';
         } else {
-            return (type === this.props.selectType)?' show':'';
+            return type === this.props.selectType ? ' show' : '';
         }
     }
 
-    // toggleContent = () => {
-    //     this.setState((prevState)=>({
-    //         onlyContent: !prevState.onlyContent
-    //     }))
-    // }
-
     render(){
-        //let ratings = this.state.ratings;
-        //let seller = this.state.seller;
-
         let { datas } = this.props;
         let ratings = datas.ratings;
         let seller = datas.seller;
@@ -130,14 +93,7 @@ class Ratings extends Component{
                         </div>
                     </div>
                     <Split></Split>
-                    <RatingSelect 
-                        //select={this.selectRating} 
-                        //ratings={ratings} 
-                        //selectType={this.state.selectType} 
-                        //toggle={this.toggleContent}
-                        //onlyContent={this.state.onlyContent}
-                    >
-                    </RatingSelect>
+                    <RatingSelect></RatingSelect>
                     <div className="rating-wrapper">
                         <ul>
                             {
@@ -174,6 +130,14 @@ class Ratings extends Component{
             </div>
         )
     }  
+}
+
+function mapStateToProps(state){
+    return {
+        datas: state.good.datas,
+        onlyContent: state.good.onlyContent,
+        selectType: state.good.selectType
+    }
 }
 
 export default connect(mapStateToProps)(Ratings);

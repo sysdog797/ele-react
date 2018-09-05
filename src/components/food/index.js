@@ -6,27 +6,21 @@ import Split from '../split/split';
 import RatingSelect from '../ratingselect/index';
 import { CSSTransitionGroup } from 'react-transition-group';
 import { connect } from 'react-redux';
-
-function mapStateToProps(state){
-    const { selectedFood, selectFoods, totalCount, totalPrice, payDesc, datas, onlyContent, selectType } = state;
-  return { selectedFood, selectFoods, totalCount, totalPrice, payDesc, datas, onlyContent, selectType }
-}
+import { bindActionCreators } from 'redux';
+import * as shopcartActions from '../../store/shopcart/actions';
+import * as goodActions from '../../store/good/actions';
 
 class Food extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectType: 2,
-            //onlyContent: true,
             needShow: true,
             showFlag: false,
             count: 0
         }
-        //this.showFlag = false;
     }
 
     componentWillReceiveProps (nextProps, nextState) {
-        //let food = this.props.food;
         let count = 0;
         let food = nextProps.selectedFood;
         let selectFoods = nextProps.selectFoods;
@@ -34,9 +28,7 @@ class Food extends Component {
             this.setState({
                 showFlag: false
             })
-            //this.showFlag = false;
         }else{
-            //this.showFlag = true;
             this.setState({
                 showFlag: true
             })
@@ -62,38 +54,11 @@ class Food extends Component {
     }
 
     hide = () => {
-        this.showFlag = false;
-        //this.setState({onlyContent:true,selectType:2});
-        //typeof this.props.hideCard === 'function' && this.props.hideCard();
-        const { dispatch } = this.props;
-        dispatch({type: 'hideCard'});
+        this.props.actions.hideCard();
     }
 
     getFood = (fd) => {
         this.foodNode = fd;
-    }
-
-    // selectRating = (type) => {
-    //     // this.setState({
-    //     //     selectType: type
-    //     // })
-    //     // this.scroll.refresh();
-    //     const { dispatch } = this.props;
-    //     dispatch({
-    //         type: 'selectRating',
-    //         selectType: type
-    //     })
-    // }
-
-    toggleContent = () => {
-        // this.setState((prevState)=>({
-        //     onlyContent: !prevState.onlyContent
-        // }))
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'toggleContent',
-            onlyContent: !this.props.onlyContent
-        })
     }
 
     needShow = (type, text) => {
@@ -157,14 +122,7 @@ class Food extends Component {
             sf.push({name: name,price: price,count: 1})
         }
         let {payDesc,total,totalCount} = this.calculateTotal(sf);
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'handleFoods', 
-            selectFoods: sf,
-            totalPrice: total,
-            payDesc: payDesc,
-            totalCount: totalCount
-        });
+        this.props.actions.handleFoods(sf, total, payDesc, totalCount);
     }
 
     render() {
@@ -190,14 +148,7 @@ class Food extends Component {
                     )
                 })
             )
-            ratingselect = (<RatingSelect 
-                                //select={this.selectRating}
-                                //ratings={food.ratings}
-                                //selectType={this.state.selectType}
-                                //toggle={this.toggleContent}
-                                //onlyContent={this.state.onlyContent}
-                                >
-                            </RatingSelect>)
+            ratingselect = <RatingSelect></RatingSelect>
         }else{
             ratings = '';
             ratingselect = '';
@@ -226,12 +177,7 @@ class Food extends Component {
                                 <span className="now">￥{food.price}</span><span className={`old${food.oldPrice?' show':''}`}>￥{food.oldPrice}</span>
                             </div>
                             <div className="cartcontrol-wrapper">
-                                <Cartcontrol
-                                    food={food}
-                                    //selectFoods={this.props.selectFoods}
-                                    //add={this.add} 
-                                    //decrease={this.decrease}
-                                ></Cartcontrol>
+                                <Cartcontrol food={food}></Cartcontrol>
                             </div>
                             <div className={`buy${(!this.state.count || this.state.count===0)?' show':''}`} onClick={this.addFirst}>加入购物车</div> 
                         </div>
@@ -253,4 +199,24 @@ class Food extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Food);
+function mapStateToProps(state) {
+    return {
+        selectedFood: state.good.selectedFood,
+        selectFoods: state.shopcart.selectFoods,
+        totalCount: state.shopcart.totalCount,
+        totalPrice: state.shopcart.totalPrice,
+        payDesc: state.shopcart.payDesc,
+        datas: state.good.datas,
+        onlyContent: state.good.onlyContent,
+        selectType: state.good.selectType
+    }
+}
+
+function mapDispatchToProps(dispatch, ownProps) {
+    return {
+        ...ownProps,
+        actions: bindActionCreators({...goodActions, ...shopcartActions}, dispatch)
+    } 
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Food);

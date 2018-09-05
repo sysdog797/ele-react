@@ -6,9 +6,8 @@ import { connect } from 'react-redux';
 import Star from '../star/index'
 
 function mapStateToProps(state){
-  const { datas } = state;
   return {
-    datas
+      datas: state.good.datas
   }
 }
 
@@ -16,7 +15,6 @@ class TopHeader extends Component{
     constructor(props){
         super(props);
         this.state = {
-            seller: {},
             detailShow: false
         }
         this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];

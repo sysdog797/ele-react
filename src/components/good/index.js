@@ -5,47 +5,20 @@ import Shopcart from '../shopcart/shopcart';
 import Cartcontrol from '../cartcontrol/cartcontrol';
 import Food from '../food/index';
 import { connect } from 'react-redux';
-
-function mapStateToProps(state){
-  const { datas } = state;
-  return { datas }
-}
-
-function selectFood(food){
-    return { type: 'selectFood', food: food };
-}
+import { bindActionCreators } from 'redux';
+import * as goodActions from '../../store/good/actions';
 
 class Good extends Component{
     constructor () {
         super();
         this.state = {
-            //datas: '',
             scrollY: 0,
-            //seller: '',
-            //selectFoods: [],
-            //selectedFood: {}
             canScroll: false
         }
         this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
         this.listHeight = [];
         this.currentIndex = 0;
     }
-
-    // componentDidMount () {
-    //     fetch('data.json').then(rs => {
-    //         rs.json().then(datas => {
-    //             this.setState({
-    //                 datas: datas.goods,
-    //                 seller: datas.seller
-    //             },this.registerMethod);
-    //         })
-    //     })
-    // }
-    // componentWillReceiveProps(nextProps,nextState){
-    //     if(nextProps.rendered && this.menuWrapper){
-    //         this.initScroll();
-    //     }
-    // }
 
     componentDidUpdate(props){
         if(this.menuWrapper && !this.state.canScroll){
@@ -55,10 +28,6 @@ class Good extends Component{
     }
 
     componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'resetRatings'
-        })
         if(this.menuWrapper && !this.state.canScroll){
             this.initScroll();
             this.calculateHeight();
@@ -132,91 +101,18 @@ class Good extends Component{
         this.foodScroll.scrollToElement(el, 300);
     }
 
-    // addFood = (name, price) => {
-    //     //let sf = this.state.selectFoods;
-    //     let sf = this.props.selectFoods;
-    //     let flag = true;
-    //     if(sf.length){
-    //         for(let i=0;i<sf.length;i++){
-    //             if(sf[i]['name']===name){
-    //                 flag = false; // 已有商品，只需count+1
-    //                 sf[i]['count']++;
-    //             }
-    //         }
-    //         if(flag){
-    //             sf.push({name:name,price:price,count:1})
-    //         }
-    //     }else{
-    //         sf.push({name: name,price: price,count: 1})
-    //     }
-    //     // this.setState({
-    //     //     selectFoods: sf
-    //     // })
-    //     dispatch({type: 'handleFoods', selectFoods: sf});
-    // }
-
-    // decrease = (name) => {
-    //     //let sf = this.state.selectFoods;
-    //     let sf = this.props.selectFoods;
-    //     for(let i=0;i<sf.length;i++){
-    //         if(sf[i]['name']===name){
-    //             if(sf[i]['count']===1){ // 只剩一个的情况下，数组中删除当前对象
-    //                 sf.splice(i,1);
-    //             }else{
-    //                 sf[i]['count']--;
-    //             }
-    //         }
-    //     }
-    //     // this.setState({
-    //     //     selectFoods: sf
-    //     // },()=>{
-    //     //     this.forceUpdate();
-    //     // })
-    //     dispatch({type: 'handleFoods', selectFoods: sf});
-    // }
-
     getShopcart = (sc) => {
         this.shopcart = sc;
     }
 
-    // clearShopcart = () => {
-    //     dispatch({type: 'clearShopcart'});
-    //     // this.setState({
-    //     //     selectFoods: []
-    //     // },()=>{
-    //     //     this.forceUpdate(); // 强制刷新了
-    //     // })
-    // }
-
     selectFood = (food) => {
-        const { dispatch } = this.props;
-        dispatch(selectFood(food));
-        // if (!ev._constructed) {
-        //     return;
-        // }
-        // this.setState({
-        //     selectedFood: food
-        // },()=>{
-        //     this.forceUpdate();
-        // })
+        this.props.actions.selectFood(food);
     }
 
-    hideCard = () => {
-        const { dispatch } = this.props;
-        dispatch({type: 'hideCard'});
-        // this.setState({
-        //     selectedFood: {}
-        // },()=>{
-        //     this.forceUpdate();
-        // })
-    }
-
-    render () {
-        
-        //let datas = this.state.datas;   
+    render () { 
         let { datas } = this.props;
         datas = datas.goods;
-
+ 
         if(datas){
             return(
                 <div>
@@ -263,13 +159,7 @@ class Good extends Component{
                                                                 <span className={`old ${food.oldPrice?'':'hide'}`}>￥{food.oldPrice}</span>
                                                             </div>
                                                             <div className="cartcontrol-wrapper">
-                                                                <Cartcontrol 
-                                                                    //add={this.addFood} 
-                                                                    //decrease={this.decrease} 
-                                                                    food={food} 
-                                                                    //selectFoods={this.state.selectFoods}
-                                                                    >
-                                                                </Cartcontrol>
+                                                                <Cartcontrol food={food}></Cartcontrol>
                                                             </div>
                                                         </div>
                                                     </li>
@@ -281,29 +171,29 @@ class Good extends Component{
                                 })}
                             </ul>
                         </div>
-                        <Shopcart 
-                            ref={this.getShopcart}
-                            //deliveryPrice={this.state.seller.deliveryPrice}
-                            //minPrice={this.state.seller.minPrice}
-                            //selectFoods={this.state.selectFoods}
-                            //clearShopcart={this.clearShopcart}
-                            //addFood={this.addFood}
-                            //decrease={this.decrease}
-                            ></Shopcart>
+                        <Shopcart ref={this.getShopcart}></Shopcart>
                     </div>
-                    <Food 
-                    //add={this.addFood} 
-                    //decrease={this.decrease} 
-                    //food={this.state.selectedFood} 
-                    //selectFoods={this.state.selectFoods} 
-                    //hideCard={this.hideCard}
-                    ></Food>
+                    <Food></Food>
                 </div>
             )
+            //return ''
         }else{
-            return ''
+           return ''
         }
     }
 }
 
-export default connect(mapStateToProps)(Good);
+function mapStateToProps(state){
+  return {
+      datas: state.good.datas
+  }
+}
+
+function mapDispatchToProps(dispatch, ownProps){
+    return {
+        ...ownProps,
+        actions: bindActionCreators({...goodActions}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Good);

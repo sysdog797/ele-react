@@ -8,60 +8,13 @@ import Ratings from '../src/components/ratings/index';
 import Seller from '../src/components/seller/index';
 
 import { connect } from 'react-redux';
-
-import fetch from 'cross-fetch';
-
-// action
-function beginFetch() {
-  return { type: 'begin' };
-}
-
-function receiveDatas(datas) {
-  // return dispatch => {
-  //   dispatch({type: 'finish', datas: datas});
-  //   return dispatch({type: 'rendered'})
-  // }
-  return { type: 'finish', datas: datas };
-}
-
-function fetchData() {
-  return dispatch => {
-    dispatch(beginFetch());
-    return fetch('data.json')
-      .then(rs => rs.json())
-      .then(datas => dispatch(receiveDatas(datas)));
-  }
-}
-
-function mapStateToProps(state){
-  const { loading, recieved, datas } = state;
-  return {
-    loading,
-    recieved,
-    datas
-  }
-}
+import { bindActionCreators } from 'redux';
+import * as goodActions from './store/good/actions';
 
 class App extends Component {
-  // constructor(props){
-  //   super(props);
-  //   this.state = {
-  //     datas: ''
-  //   }
-  // }
 
   componentDidMount = () => {
-    fetch('data.json').then(rs => {
-      rs.json().then(datas => {
-        this.setState({
-          datas: datas
-        });
-      })
-    })
-
-    const { dispatch } = this.props;
-
-    dispatch(fetchData());
+    this.props.actions.fetchData();
   }
 
   render() {
@@ -89,4 +42,17 @@ class App extends Component {
   }
 }
 
-export default connect(mapStateToProps)(App);
+function mapStateToProps(state){
+  return {
+    datas: state.good.datas
+  }
+}
+
+function mapDispatchToProps(dispatch, ownProps) {
+  return {
+      ...ownProps,
+      actions: bindActionCreators({...goodActions}, dispatch)
+  } 
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

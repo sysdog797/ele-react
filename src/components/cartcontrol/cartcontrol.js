@@ -1,41 +1,14 @@
 import React, { Component } from 'react';
 import './cartcontrol.styl';
 import { connect } from 'react-redux';
-
-function mapStateToProps(state){
-    let { selectFoods, totalCount, totalPrice, payDesc, datas } = state;
-    return { selectFoods, totalCount, totalPrice, payDesc, datas }
-}
+import { bindActionCreators } from 'redux';
+import * as shopcartActions from '../../store/shopcart/actions';
 
 class Cartcontrol extends Component{
     constructor (props) {
         super(props);
         this.state = {
             count: 0
-        }
-    }
-
-    componentWillReceiveProps () {
-        this.initCart(this.props.selectFoods);
-    }
-
-    initCart= (food) => {
-        let hasFood = false;
-        if(typeof food === 'undefined'){
-            return;
-        }
-        if(food.length===0){
-            this.setState({count:0});
-            return;
-        }
-        for(let i=0;i<food.length;i++){
-            if(food[i]['name']===this.props.food.name){
-                this.setState({count:food[i]['count']});
-                hasFood = true;
-            }
-        }
-        if(!hasFood){
-            this.setState({count:0});
         }
     }
 
@@ -62,15 +35,6 @@ class Cartcontrol extends Component{
 
     addCart = (ev) => {
         ev.stopPropagation();
-        if (!this.state.count) {
-            this.setState({
-                count: 1
-            })
-        } else {
-            this.setState((prevState)=>({
-                count: prevState.count + 1
-            }))
-        }
         let sf = this.props.selectFoods;
         let { name, price } = this.props.food;
         let flag = true;
@@ -88,24 +52,11 @@ class Cartcontrol extends Component{
             sf.push({name: name,price: price,count: 1})
         }
         let {payDesc,total,totalCount} = this.calculateTotal(sf);
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'handleFoods', 
-            selectFoods: sf,
-            totalPrice: total,
-            payDesc: payDesc,
-            totalCount: totalCount
-         });
-        //typeof this.props.add === 'function' && this.props.add(this.props.food.name,this.props.food.price);
+        this.props.actions.handleFoods(sf, total, payDesc, totalCount);
     }
 
     decreaseCart = (ev) => {
         ev.stopPropagation();
-        if (this.state.count) {
-            this.setState((prevState)=>({
-                count: prevState.count - 1
-            }))
-        }
         let sf = this.props.selectFoods;
         let name = this.props.food.name;
         for(let i=0;i<sf.length;i++){
@@ -118,15 +69,7 @@ class Cartcontrol extends Component{
             }
         }
         let {payDesc,total,totalCount} = this.calculateTotal(sf);
-        const { dispatch } = this.props;
-        dispatch({
-            type: 'handleFoods', 
-            selectFoods: sf,
-            totalPrice: total,
-            payDesc: payDesc,
-            totalCount: totalCount
-         });
-        //typeof this.props.decrease === 'function' && this.props.decrease(this.props.food.name);
+        this.props.actions.handleFoods(sf, total, payDesc, totalCount);
     }
 
     render(){
@@ -150,4 +93,21 @@ class Cartcontrol extends Component{
     }
 }
 
-export default connect(mapStateToProps)(Cartcontrol);
+function mapStateToProps(state) {
+    return {
+        selectFoods: state.shopcart.selectFoods,
+        totalCount: state.shopcart.totalCount,
+        totalPrice: state.shopcart.totalPrice,
+        payDesc: state.shopcart.payDesc,
+        datas: state.good.datas
+    }
+}
+
+function mapDispatchToProps(dispatch, ownProps) {
+    return {
+        ...ownProps,
+        actions: bindActionCreators({...shopcartActions}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cartcontrol);

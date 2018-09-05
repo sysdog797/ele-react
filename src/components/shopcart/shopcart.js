@@ -1,20 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './shopcart.styl';
+import { bindActionCreators } from 'redux';
+import * as shopcartActions from '../../store/shopcart/actions';
 
 import Cartcontrol from '../cartcontrol/cartcontrol';
-
-function mapStateToProps(state){
-    let { datas, totalCount, totalPrice, payDesc, selectFoods } = state;
-    return { datas, totalCount, totalPrice, payDesc, selectFoods }
-}
 
 class Shopcart extends Component{
     constructor(props){
         super(props);
         this.state = {
-            //payDesc: '',
-            //totalPrice: 0,
             listShow: false
         }
     }
@@ -25,47 +20,7 @@ class Shopcart extends Component{
                 listShow: false
             })
         }
-        //this.calculateTotal();
     }
-
-    componentDidMount () {
-        // this.setState({
-        //     payDesc: `￥${this.props.minPrice}元起送`
-        // })
-    }
-
-    // calculateTotal = () => {
-    //     console.log(1)
-    //     let total = 0;
-    //     let payDesc = '';
-    //     let minPrice = this.props.minPrice;
-    //     let totalCount = 0;
-    //     this.props.selectFoods.forEach((food)=>{
-    //         total += food.price*food.count;
-    //         totalCount += food.count;
-    //     })
-    //     if(total===0){
-    //         payDesc = `￥${minPrice}元起送`;
-    //         this.setState({listShow:false}); // 购物车没有内容不显示
-    //     }else if(total< minPrice){
-    //         let diff = minPrice - total;
-    //         payDesc = `还差￥${diff}元起送`;
-    //     }else{
-    //         payDesc = '去结算';
-    //     }
-    //     const { dispatch } = this.props;
-    //     dispatch({
-    //         type: 'calculateTotal',
-    //         totalPrice: total,
-    //         payDesc: payDesc,
-    //         totalCount: totalCount
-    //     })
-    //     // this.setState({
-    //     //     totalPrice: total,
-    //     //     payDesc: payDesc,
-    //     //     totalCount: totalCount
-    //     // })
-    // }
 
     pay = (ev) => {
         ev.stopPropagation();
@@ -91,21 +46,11 @@ class Shopcart extends Component{
     }
 
     clear = () => {
-        // typeof this.props.clearShopcart === 'function' && this.props.clearShopcart();
-        const { dispatch } = this.props;
-        dispatch({type: 'clearShopcart'});
+        this.props.actions.clearShopcart();
         this.setState({
             listShow: false
         })
     }
-
-    // addFood = (name, price) => {
-    //     typeof this.props.addFood === 'function' && this.props.addFood(name, price);
-    // }
-
-    // decrease = (name) => {
-    //     typeof this.props.decrease === 'function' && this.props.decrease(name);
-    // }
 
     render(){
         const { datas, totalCount, totalPrice, payDesc, selectFoods } = this.props;
@@ -145,12 +90,7 @@ class Shopcart extends Component{
                                                     <span>￥{food.price*food.count}</span>
                                                 </div>
                                                 <div className="cartcontrol-wrapper">
-                                                    <Cartcontrol 
-                                                        //add={this.addFood} 
-                                                        //decrease={this.decrease} 
-                                                        food={food} 
-                                                        //selectFoods={this.props.selectFoods}
-                                                    ></Cartcontrol>
+                                                    <Cartcontrol food={food}></Cartcontrol>
                                                 </div>
                                             </li>
                                         )
@@ -166,4 +106,21 @@ class Shopcart extends Component{
     }
 }
 
-export default connect(mapStateToProps)(Shopcart);
+function mapStateToProps(state){
+    return {
+        datas: state.good.datas,
+        totalCount: state.shopcart.totalCount,
+        totalPrice: state.shopcart.totalPrice,
+        payDesc: state.shopcart.payDesc,
+        selectFoods: state.shopcart.selectFoods
+    }
+}
+
+function mapDispatchToProps(dispatch, ownProps) {
+    return {
+        ...ownProps,
+        actions: bindActionCreators({...shopcartActions}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Shopcart);
